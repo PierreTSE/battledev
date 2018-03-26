@@ -30,7 +30,7 @@ bool is_in_forme_conv(const std::pair<double, double>& point, const std::vector<
 
 	for (unsigned int i = 0; i < N; ++i)
 	{
-		int j = i % (N - 1);
+		size_t j = i % (N - 1);
 		auto AB = forme[j + 1] - forme[j];
 		auto AC = point - forme[j];
 		double p_vectoriel = AB.first*AC.second - AB.second * AC.first;
