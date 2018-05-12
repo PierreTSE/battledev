@@ -9,16 +9,16 @@
 #include <algorithm>
 
 
-template<typename Node, typename Distance>
+template<typename Node, typename Distance, typename ContainerT = std::set<Node>>
 class Dijkstra_solver;
 
-template<typename Node, typename Distance>
+template<typename Node, typename Distance, typename ContainerT = std::set<Node>>
 class Dijkstra_data
 {
-    friend class Dijkstra_solver<Node, Distance>;
+    friend class Dijkstra_solver<Node, Distance, ContainerT>;
 
     public:
-        Dijkstra_data& set(std::set<Node> q);
+        Dijkstra_data& set(const ContainerT& q);
         Dijkstra_data& length_function(std::function<Distance(Node, Node)> l);
         Dijkstra_data& far_value(Distance f);
         Dijkstra_data& near_value(Distance n);
@@ -31,7 +31,7 @@ class Dijkstra_data
         std::bitset<7> hasData = 0x60;
 
         // Data for Djikstra algorithm
-        std::set<Node> Q;
+        ContainerT Q;
         std::function<Distance(Node, Node)> length;
         Distance far;
         Distance near;
@@ -41,7 +41,7 @@ class Dijkstra_data
 };
 
 
-template<typename Node, typename Distance>
+template<typename Node, typename Distance, typename ContainerT>
 class Dijkstra_solver
 {
     public:
@@ -60,8 +60,8 @@ class Dijkstra_solver
 };
 
 
-template<typename Node, typename Distance>
-Dijkstra_data<Node, Distance>& Dijkstra_data<Node, Distance>::set(std::set<Node> q)
+template<typename Node, typename Distance, typename ContainerT>
+Dijkstra_data<Node, Distance, ContainerT>& Dijkstra_data<Node, Distance, ContainerT>::set(const ContainerT& q)
 {
     Q = q;
     hasData.set(0);
@@ -69,8 +69,8 @@ Dijkstra_data<Node, Distance>& Dijkstra_data<Node, Distance>::set(std::set<Node>
     return *this;
 }
 
-template<typename Node, typename Distance>
-Dijkstra_data<Node, Distance>& Dijkstra_data<Node, Distance>::length_function(std::function<Distance(Node, Node)> l)
+template<typename Node, typename Distance, typename ContainerT>
+Dijkstra_data<Node, Distance, ContainerT>& Dijkstra_data<Node, Distance, ContainerT>::length_function(std::function<Distance(Node, Node)> l)
 {
     length = l;
     hasData.set(1);
@@ -78,8 +78,8 @@ Dijkstra_data<Node, Distance>& Dijkstra_data<Node, Distance>::length_function(st
     return *this;
 }
 
-template<typename Node, typename Distance>
-Dijkstra_data<Node, Distance>& Dijkstra_data<Node, Distance>::far_value(Distance f)
+template<typename Node, typename Distance, typename ContainerT>
+Dijkstra_data<Node, Distance, ContainerT>& Dijkstra_data<Node, Distance, ContainerT>::far_value(Distance f)
 {
     far = f;
     hasData.set(2);
@@ -87,8 +87,8 @@ Dijkstra_data<Node, Distance>& Dijkstra_data<Node, Distance>::far_value(Distance
     return *this;
 }
 
-template<typename Node, typename Distance>
-Dijkstra_data<Node, Distance>& Dijkstra_data<Node, Distance>::near_value(Distance n)
+template<typename Node, typename Distance, typename ContainerT>
+Dijkstra_data<Node, Distance, ContainerT>& Dijkstra_data<Node, Distance, ContainerT>::near_value(Distance n)
 {
     near = n;
     hasData.set(3);
@@ -96,8 +96,8 @@ Dijkstra_data<Node, Distance>& Dijkstra_data<Node, Distance>::near_value(Distanc
     return *this;
 }
 
-template<typename Node, typename Distance>
-Dijkstra_data<Node, Distance>& Dijkstra_data<Node, Distance>::start_node(Node A)
+template<typename Node, typename Distance, typename ContainerT>
+Dijkstra_data<Node, Distance, ContainerT>& Dijkstra_data<Node, Distance, ContainerT>::start_node(Node A)
 {
     start = A;
     hasData.set(4);
@@ -105,8 +105,8 @@ Dijkstra_data<Node, Distance>& Dijkstra_data<Node, Distance>::start_node(Node A)
     return *this;
 }
 
-template<typename Node, typename Distance>
-Dijkstra_data<Node, Distance>& Dijkstra_data<Node, Distance>::combinaison_op(std::function<Distance(Distance, Distance)> op)
+template<typename Node, typename Distance, typename ContainerT>
+Dijkstra_data<Node, Distance, ContainerT>& Dijkstra_data<Node, Distance, ContainerT>::combinaison_op(std::function<Distance(Distance, Distance)> op)
 {
     combinaison = op;
     hasData.set(5);
@@ -114,8 +114,8 @@ Dijkstra_data<Node, Distance>& Dijkstra_data<Node, Distance>::combinaison_op(std
     return *this;
 }
 
-template<typename Node, typename Distance>
-Dijkstra_data<Node, Distance>& Dijkstra_data<Node, Distance>::shorter_than_op(std::function<bool(Distance, Distance)> op)
+template<typename Node, typename Distance, typename ContainerT>
+Dijkstra_data<Node, Distance, ContainerT>& Dijkstra_data<Node, Distance, ContainerT>::shorter_than_op(std::function<bool(Distance, Distance)> op)
 {
     shorter = op;
     hasData.set(6);
@@ -123,16 +123,16 @@ Dijkstra_data<Node, Distance>& Dijkstra_data<Node, Distance>::shorter_than_op(st
     return *this;
 }
 
-template<typename Node, typename Distance>
-bool Dijkstra_data<Node, Distance>::is_valid() const
+template<typename Node, typename Distance, typename ContainerT>
+bool Dijkstra_data<Node, Distance, ContainerT>::is_valid() const
 {
     return hasData.all() && Q.find(start) != Q.end();
 }
 
 
 
-template<typename Node, typename Distance>
-void Dijkstra_solver<Node, Distance>::solve()
+template<typename Node, typename Distance, typename ContainerT>
+void Dijkstra_solver<Node, Distance, ContainerT>::solve()
 {
     if(is_solved || !data.is_valid())
         return;
@@ -145,9 +145,10 @@ void Dijkstra_solver<Node, Distance>::solve()
 
     while(!Q.empty())
     {
-        Node n1 = *std::min_element(Q.begin(), Q.end(), [this](Node a, Node b)
+        auto it = std::min_element(Q.begin(), Q.end(), [this](Node a, Node b)
                                     { return data.shorter(dist[a], dist[b]); });
-        Q.erase(n1);
+        Node n1 = *it;
+        Q.erase(it);
 
         for(Node n2 : data.Q)
         {
@@ -163,14 +164,14 @@ void Dijkstra_solver<Node, Distance>::solve()
     is_solved = true;
 }
 
-template<typename Node, typename Distance>
-Distance Dijkstra_solver<Node, Distance>::d(Node n)
+template<typename Node, typename Distance, typename ContainerT>
+Distance Dijkstra_solver<Node, Distance, ContainerT>::d(Node n)
 {
     return (dist.find(n) != dist.end() ? dist[n] : data.far);
 }
 
-template<typename Node, typename Distance>
-std::list<Node> Dijkstra_solver<Node, Distance>::path_to(Node n)
+template<typename Node, typename Distance, typename ContainerT>
+std::list<Node> Dijkstra_solver<Node, Distance, ContainerT>::path_to(Node n)
 {
     if(previous.find(n) == previous.end())
         return std::list<Node>();
