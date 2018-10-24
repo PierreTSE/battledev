@@ -30,13 +30,19 @@ std::vector<std::string> split(const std::string& str, const std::string& sep = 
 	std::vector<std::string> out;
 	size_t debut = 0;
 	size_t fin = str.find(sep);
-    while(debut <= str.length())
-    {
+	while(debut <= str.length())
+    	{
 		out.push_back(str.substr(debut, fin - debut));
 		debut = fin != std::string::npos ? fin + sep.length() : fin;
 		fin = str.find(sep, debut);
-    }
+    	}
 	return out;
+}
+
+std::string trim(const std::string& str)
+{
+	auto pred = [](const unsigned char c) { return std::isspace(c) || std::iscntrl(c); };
+	return str.substr(&*std::find_if_not(str.begin(), str.end(), pred) - str.data(), &*std::find_if_not(str.rbegin(), str.rend(), pred) - &*std::find_if_not(str.begin(), str.end(), pred) + 1);
 }
 
 #endif // !FONCTIONS_STRING_H
