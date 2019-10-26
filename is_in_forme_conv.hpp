@@ -6,7 +6,7 @@
 #include <utility>
 
 template<typename T, typename U>
-std::pair<T, U>& operator-(const std::pair<T, U>& lhs, const std::pair<T, U>& rhs)
+std::pair<T, U> operator-(const std::pair<T, U>& lhs, const std::pair<T, U>& rhs)
 {
 	std::pair<T, U> out(lhs);
 	out.first -= rhs.first;
@@ -15,7 +15,7 @@ std::pair<T, U>& operator-(const std::pair<T, U>& lhs, const std::pair<T, U>& rh
 }
 
 template<typename T, typename U>
-std::pair<T, U>& operator*(const std::pair<T, U>& lhs, const std::pair<T, U>& rhs)
+std::pair<T, U> operator*(const std::pair<T, U>& lhs, const std::pair<T, U>& rhs)
 {
 	std::pair<T, U> out(lhs);
 	out.first *= rhs.first;
@@ -35,7 +35,7 @@ bool is_in_forme_conv(const std::pair<double, double>& point, const std::vector<
 		auto AC = point - forme[j];
 		double p_vectoriel = AB.first*AC.second - AB.second * AC.first;
 		if (avec_aretes && p_vectoriel > 0) return false;
-		if (!avec_aretes && p_vectoriel >= 0) return false;
+		else if (!avec_aretes && p_vectoriel >= 0) return false;
 	}
 	return true;
 }
