@@ -8,22 +8,6 @@ std::string delete_spaces(std::string& str)
 	return str;
 }
 
-std::vector<std::string> separe_mots(std::string str)
-{
-	std::vector<std::string> v_out;
-	auto debut = str.find_first_not_of(' ');
-	auto fin = str.find_first_of(' ', debut);
-	while (debut != std::string::npos)
-	{
-		v_out.push_back(str.substr(debut, fin - debut));
-		debut = str.find_first_not_of(' ', fin);
-		fin = str.find_first_of(' ', debut);
-	}
-	return v_out;
-}
-
-// nouvelles fonctions
-
 std::vector<std::string> split(const std::string& str, const std::string& sep = " ")
 {
 	std::vector<std::string> out;
@@ -53,6 +37,4 @@ void replaceAll(std::string& str, const std::string& from, const std::string& to
         start_pos += to.length(); 
     }
 }
-
-#endif // !FONCTIONS_STRING_H
 
