@@ -16,7 +16,7 @@ namespace fs = std::filesystem;
 
 int main() {
     const fs::path
-            path_to_tests(R"(D:\_Programmation\Battle dev\2020-11-26\4)");
+            path_to_tests(R"(D:\_Programmation\Battle dev\2021-06-03\4)");
 
 
     for (auto& p : fs::directory_iterator(path_to_tests.is_absolute() ? path_to_tests : fs::current_path() / path_to_tests)) {
